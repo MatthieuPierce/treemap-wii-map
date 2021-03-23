@@ -1,14 +1,11 @@
 import './index.css';
 import { 
   extent,
-  geoAlbersUsa,
-  geoPath,
   interpolateBuGn,
   json, 
   scaleSequential,
  } from 'd3';
  import { feature, mesh } from 'topojson-client';
-
 import { colorValue } from './accessors';
 import { chart } from './chartParameters';
 import { makeSequentialLegend } from './legendSequential'
@@ -17,10 +14,10 @@ import { parseData } from './parseData';
 import { handleMouseOver, handleMouseOut } from './handleMouse';
 
 // NON-CODE PLANNING: CHART OBJECTIVES
-// United States map (states only), subdivided into counties (s-axis)
-// color scale to indicate % of educational attaiment (bachelor's deg) (c-axis)
-// tooltip with data-education property
-// nation and state paths for clarity
+// top 100 best-selling video games
+// by category (color scale/ordinal + spatial grouping) 
+// and sales volume (area/sqrt)
+// tooltip with data-value property and optional details
 
 // Chart basic construction & layout parameters in chartParameters.js
 

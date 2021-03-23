@@ -10,8 +10,8 @@ export const margin = {
   left: padding + 10
 };
 
-let width = 1000;
-let height = 650;
+let width = 960;
+let height = 640;
 export const innerWidth = width - margin.left - margin.right;
 export const innerHeight = height - margin.top - margin.bottom;
 
@@ -22,8 +22,6 @@ export let chart = select('#chart-container')
     .attr("preserveAspectRatio", "xMinYMin meet")
     .attr("viewBox", `0 0 ${width} ${height}`)
     .attr("svg-content", true)
-    .style("background", "var(--secondary-color)")
-    .style("color", "var(--primary-color)")
     .attr("font-size", 11)
   //Margin convention
   .append('g')
