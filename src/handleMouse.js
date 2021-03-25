@@ -14,55 +14,54 @@ export const handleMouseOver = (event, d, colorScale) => {
     // .attr("filter", "url(#svgFilter)")
     // .attr("opacity", 1)
 
-    if (event.currentTarget.className.baseVal !== `legend`) {
-    tooltip
-      .html(`
-          <p class="tooltip-name">${leafName(d)}</p>
-          <p class="tooltip-category">Console: ${parentName(d)}</p>
-          <p class="tooltip-value">${leafValue(d)}M units sold</p>
-        `)
+    // Only act on tooltip if element has a className.baseVal (i.e., is an svg)
+    // and only if the class string includes "legend" (potentially risky)  
+    if (event.currentTarget.className.baseVal) {
+      if (!event.currentTarget.className.baseVal.includes("legend")){
+        tooltip
+        .html(`
+            <p class="tooltip-name">${leafName(d)}</p>
+            <p class="tooltip-category">Console: ${parentName(d)}</p>
+            <p class="tooltip-value">${leafValue(d)}M sold</p>
+          `)
+      
+      tooltip
+        .attr("visibility", "visible")
+        .style("background-color", colorScale(parentName(d)))
+        .attr("data-value", leafValue(d))
+        .style("display", "grid")
     
-  tooltip
-    .attr("visibility", "visible")
-    .style("background-color", colorScale(parentName(d)))
-    .attr("data-value", leafValue(d))
-    .style("display", "grid")
-
-  // Position and transition tooltip
-  let tooltipDimensions = document.querySelector("#tooltip")
-    .getBoundingClientRect();
-  let chartDimensions = document.querySelector("#chart")
-    .getBoundingClientRect(); 
-  
-  tooltip
-    // .attr("visibility", "visible")
-    // .attr("data-education", val)
-    // .style("display", "grid")
-    .style("top", 
-      `${clamp(
-        chartDimensions.top,
-        // event.clientY - tooltipDimensions.height - 5,
-        event.clientY + 15,
-        chartDimensions.bottom - tooltipDimensions.height - 1
-      )}px`)
-
-    .style("left",
-      `${clamp(
-        margin.left,
-        event.clientX + 5,
-        chartDimensions.right - tooltipDimensions.width - 12
-      )}px`)
-    .style("z-index", 20)
-    // .transition()
-    // .duration(50)
-    .style("opacity", 1)
+      // Position and transition tooltip
+      let tooltipDimensions = document.querySelector("#tooltip")
+        .getBoundingClientRect();
+      let chartDimensions = document.querySelector("#chart")
+        .getBoundingClientRect(); 
+      
+      tooltip
+        // .attr("visibility", "visible")
+        // .attr("data-education", val)
+        // .style("display", "grid")
+        .style("top", 
+          `${clamp(
+            chartDimensions.top,
+            // event.clientY - tooltipDimensions.height - 5,
+            event.clientY + 15,
+            chartDimensions.bottom - tooltipDimensions.height - 1
+          )}px`)
+    
+        .style("left",
+          `${clamp(
+            margin.left,
+            event.clientX + 5,
+            chartDimensions.right - tooltipDimensions.width - 12
+          )}px`)
+        .style("z-index", 20)
+        // .transition()
+        // .duration(50)
+        .style("opacity", 1)
+      }
+    
   }
-    // Only act on tooltip if mark class is not "legend-mark";
-  // previously encased all tooltip activity above, had to be 
-  // depreciated just to affecting opacity due to fcc-test constraints
-  // if (event.currentTarget.className.baseVal !== `legend-mark`) {
-  //   }
-  
 }
 
 // Handle mouseOut/leave

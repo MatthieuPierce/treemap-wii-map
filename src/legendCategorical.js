@@ -46,7 +46,7 @@ export const makeCategoricalLegend = (
       .attr("width", colorBandsScale.bandwidth())
       .attr("height", 25)
       .attr("fill", d => colorScale(d))
-      .attr("class", "legend-mark legend")
+      .attr("class", "legend-mark legend-item legend")
       .attr("opacity", 0.5)
       // .attr("stroke", `var(--secondary-color)`)
       // .attr("stroke-width", "1px")
