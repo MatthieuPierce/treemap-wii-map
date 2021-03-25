@@ -59,9 +59,13 @@ p {
   margin: 0;
   padding: 0;
   user-select: none;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 700;
 
+}
+
+.legend .legend-title {
+  font-size: 1rem;
 }
 
 /* foreignObject {

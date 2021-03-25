@@ -10,7 +10,7 @@ export const makeCategoricalLegend = (
   ) => {
   
   let legend = chart.append("g")
-    .attr("transform", `translate(${(0)}, ${innerHeight + 15})`)
+    .attr("transform", `translate(${(0)}, ${innerHeight + 20})`)
     .attr("id", "legend")
     .attr("class", "legend")
 
@@ -67,11 +67,11 @@ export const makeCategoricalLegend = (
       .attr("fill", "var(--primary-color)")
 
   legend.append("text")
-    .text("Console")
+    .text("Primary Console")
     .style("font-weight", 700)
     .attr("class", "legend-title legend")
     .attr("text-anchor", "start")
     .attr("y", 0)
-    .attr("x", 5)
+    .attr("x", 0)
 
 }

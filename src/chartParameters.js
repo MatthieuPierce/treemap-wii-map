@@ -6,7 +6,7 @@ export const padding = 7;
 export const margin = {
   top: padding,
   right: padding,
-  bottom: padding + 45,
+  bottom: padding + 50,
   left: padding
 };
 

@@ -84,7 +84,7 @@ let asyncWrapper = async () => {
     let categorySteps = 1 / categories.length;
     let categoryTValues = range(0, 1, categorySteps).concat(1);
     // re-sort values to radiate from 0 in the center
-    let valuesReSort = categoryTValues.reduce((acc, e, i) => {
+    const reSort = (acc, e, i) => {
       let firstAcc = acc[0];
       let lastAcc = acc[acc.length - 1];
       if (Math.abs(firstAcc + e) >= Math.abs(lastAcc + e)) {
@@ -92,7 +92,8 @@ let asyncWrapper = async () => {
       } else {
         return [ e, ...acc]
       }
-    },[])
+    }
+    let valuesReSort = categoryTValues.reduce(reSort,[])
     let schemeOrdinalSequential = valuesReSort.map(t => interpolateSinebow(t));
     // let schemeShuffle = shuffle(schemeOrdinalSequential.slice());
     const colorScaleOrdinalSeq = scaleOrdinal(schemeOrdinalSequential)
@@ -100,18 +101,19 @@ let asyncWrapper = async () => {
 
     // tiles: treemap leaf tile groups
     let leaf = chart.selectAll("g")
-        .data(root.leaves())
-        .join("g")
-          .attr("transform", d => `translate(${d.x0}, ${d.y0})`)
-          .attr("class", "leaf-group")
-          .on("mouseover mousemove pointerover focus", 
+      .data(root.leaves())
+      .join("g")
+        .attr("transform", d => `translate(${d.x0}, ${d.y0})`)
+        .attr("class", "leaf-group")
+        .on("mouseover mousemove pointerover focus", 
           (event, d) => handleMouseOver(event, d, colorScaleOrdinalSeq))
         .on("mouseout pounterout pointerleave", 
           (event, d) => handleMouseOut(event, d))
 
-      let spaceRegex = /\s/gi;
-      let etcRegex = /[^a-zA-Z0-9\-]/gi
-      const formatStringForId = s => s.replaceAll(spaceRegex, '-').replaceAll(etcRegex, '');
+    //reformat string function to make leaf name values viable as ids
+    let spaceRegex = /\s/gi;
+    let etcRegex = /[^a-zA-Z0-9\-]/gi
+    const formatStringForId = s => s.replaceAll(spaceRegex, '-').replaceAll(etcRegex, '');
 
     // treemap leaf tile rects
       leaf.append("rect")
@@ -126,20 +128,19 @@ let asyncWrapper = async () => {
         .attr("width", d => d.x1 - d.x0)
         .attr("height", d => d.y1 - d.y0)
         
-    // clip path for text in leaf
-    leaf.append("clipPath")
-      .attr("id", d => `leaf-clip-path-${formatStringForId(leafName(d))}`)
-      .append("use")
-      .attr("xlink:href", d => `#leaf-rect-${formatStringForId(leafName(d))}`)
+    // // clip path for text in leaf //currently not using
+    // leaf.append("clipPath")
+    //   .attr("id", d => `leaf-clip-path-${formatStringForId(leafName(d))}`)
+    //   .append("use")
+    //     .attr("xlink:href", d => `#leaf-rect-${formatStringForId(leafName(d))}`)
 
     // treemap leaf text as svg foreignObject
     let foreignDiv = leaf.append("foreignObject")
       .attr("class", "tile-foreign-object")
-      // .attr("clip-path", d => `url(#leaf-clip-path-${formatStringForId(leafName(d))})` )
       .attr("x", 5)
       .attr("y", 5)
       .attr("width", d => d.x1 - d.x0 - 5)
-      .attr("height", d => d.y1 - d.y0 - 10)
+      .attr("height", d => d.y1 - d.y0 - 5)
       .append('xhtml:div')
         .attr("class", "tile-foreign-div")
         .on("mouseover mousemove pointerover focus", 
