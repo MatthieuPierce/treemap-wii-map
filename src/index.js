@@ -19,6 +19,7 @@ import { chart, innerHeight, innerWidth } from './chartParameters';
 import { makeSequentialLegend } from './legendSequential'
 import { parseData } from './parseData';
 import { handleMouseOver, handleMouseOut } from './handleMouse';
+import { makeCategoricalLegend } from './legendCategorical';
 
 // NON-CODE PLANNING: CHART OBJECTIVES
 // top 100 best-selling video games
@@ -64,7 +65,7 @@ let asyncWrapper = async () => {
       .size([innerWidth, innerHeight])
       .tile(treemapSquarify)  // treemapSquarify is default
       .paddingInner(2)
-      .paddingOuter(1)
+      .paddingOuter(0)
       .round(true)
       (d);
 
@@ -117,6 +118,7 @@ let asyncWrapper = async () => {
       .data(root.leaves())
       .join("g")
         .attr("transform", d => `translate(${d.x0}, ${d.y0})`)
+        .attr("class", "leaf-group")
 
     let spaceRegex = /\s/gi;
     let etcRegex = /[^a-zA-Z0-9\-]/gi
@@ -143,16 +145,22 @@ let asyncWrapper = async () => {
 
 
   // treemap leaf text as svg foreignObject
-  leaf.append("foreignObject")
+  let foreignText = leaf.append("foreignObject")
     .attr("class", "tile-text")
     // .attr("clip-path", d => `url(#leaf-clip-path-${formatStringForId(d.data.name)})` )
     .attr("x", 5)
-    .attr("y", 10)
-    .attr("width", 100)
-    .attr("height", 100)
-    .append('xhtml:div')
-        .attr("xmlns", "http://www.w3.org/1999/xhtml")
-        .text(d => `${d.data.name}`)
+    .attr("y", 5)
+    .attr("width", d => d.x1 - d.x0 - 5)
+    .attr("height", d => d.y1 - d.y0 - 10)
+
+  foreignText.append('xhtml:div')
+    // .attr("xmlns", "http://www.w3.org/1999/xhtml")
+    .text(d => `${d.data.name}`)
+
+  foreignText.append('xhtml:div')
+    // .attr("xmlns", "http://www.w3.org/1999/xhtml")
+    .attr("class", "units-sold")
+    .text(d => `${d.data.value}M sold`)
 
   // treemap leaf text
     // leaf.append("text")
@@ -168,23 +176,9 @@ let asyncWrapper = async () => {
     //     .attr("x", 5)
     //     .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
 
+    // makeCategoricalLegend takes colorKeys and colorScale
 
-
-    // Marks (circles) -- from marks.js
-    // marks(
-    //   dataset, 
-    //   xScale, 
-    //   yScale,
-    //   colorScale,
-    //   xBand
-    //   );
-
-    // xAxis -- buildXAxis function in xAxis.js
-    // buildXAxis(xScale);
-
-    // yAxis -- buildYAxis function in yAxis.js
-    // buildYAxis(yScale);
-
+    makeCategoricalLegend(categories, colorScaleOrdinalSequential);
 
     }
   )

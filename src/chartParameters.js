@@ -1,13 +1,13 @@
 import { select } from 'd3';
 
 // Chart parameters
-export const padding = 20;
+export const padding = 5;
 
 export const margin = {
-  top: padding + 10,
-  right: padding - 10,
-  bottom: padding - 10,
-  left: padding + 10
+  top: padding,
+  right: padding,
+  bottom: padding + 45,
+  left: padding
 };
 
 let width = 960;
