@@ -14,19 +14,19 @@ export const handleMouseOver = (event, d, colorScale) => {
     // .attr("filter", "url(#svgFilter)")
     // .attr("opacity", 1)
 
-    if (event.currentTarget.className.baseVal !== `legend-mark-group`) {
+    if (event.currentTarget.className.baseVal !== `legend`) {
     tooltip
       .html(`
-          <p class="tip-name">${leafName(d)}</p>
-          <p>Console: ${parentName(d)}</p>
-          <p>${leafValue(d)} Million units sold</p>
+          <p class="tooltip-name">${leafName(d)}</p>
+          <p class="tooltip-category">Console: ${parentName(d)}</p>
+          <p class="tooltip-value">${leafValue(d)}M units sold</p>
         `)
-    }
+    
   tooltip
     .attr("visibility", "visible")
-    .attr("data-value", d => leafValue(d))
+    .style("background-color", colorScale(parentName(d)))
+    .attr("data-value", leafValue(d))
     .style("display", "grid")
-    .style("background-color", d => colorScale(parentName(d)))
 
   // Position and transition tooltip
   let tooltipDimensions = document.querySelector("#tooltip")
@@ -38,26 +38,25 @@ export const handleMouseOver = (event, d, colorScale) => {
     // .attr("visibility", "visible")
     // .attr("data-education", val)
     // .style("display", "grid")
-    .style("top", `${event.clientY - tooltipDimensions.height - 5}px`)
+    .style("top", 
+      `${clamp(
+        chartDimensions.top,
+        // event.clientY - tooltipDimensions.height - 5,
+        event.clientY + 15,
+        chartDimensions.bottom - tooltipDimensions.height - 1
+      )}px`)
 
-      // `${clamp(
-      //   0,
-      //   event.offsetY - tooltipDimensions.height - 5,
-      //   chartDimensions.height - tooltipDimensions.height - 2
-      // )}px`)
-
-    .style("left", `${event.clientX + 5}px`)
-
-      // `${clamp(
-      //   margin.left,
-      //   event.offsetX + 5,
-      //   chartDimensions.width - tooltipDimensions.width - 2
-      // )}px`)
+    .style("left",
+      `${clamp(
+        margin.left,
+        event.clientX + 5,
+        chartDimensions.right - tooltipDimensions.width - 12
+      )}px`)
     .style("z-index", 20)
-    .transition()
-    .duration(50)
+    // .transition()
+    // .duration(50)
     .style("opacity", 1)
-      
+  }
     // Only act on tooltip if mark class is not "legend-mark";
   // previously encased all tooltip activity above, had to be 
   // depreciated just to affecting opacity due to fcc-test constraints

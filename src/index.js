@@ -104,8 +104,10 @@ let asyncWrapper = async () => {
         .join("g")
           .attr("transform", d => `translate(${d.x0}, ${d.y0})`)
           .attr("class", "leaf-group")
-          .on("mouseover mousemove pointerover focus", handleMouseOver)
-          .on("mouseout pounterout pointerleave", handleMouseOut)
+          .on("mouseover mousemove pointerover focus", 
+          (event, d) => handleMouseOver(event, d, colorScaleOrdinalSeq))
+        .on("mouseout pounterout pointerleave", 
+          (event, d) => handleMouseOut(event, d))
 
       let spaceRegex = /\s/gi;
       let etcRegex = /[^a-zA-Z0-9\-]/gi

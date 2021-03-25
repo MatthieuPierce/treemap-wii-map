@@ -12,6 +12,7 @@ export const makeCategoricalLegend = (
   let legend = chart.append("g")
     .attr("transform", `translate(${(0)}, ${innerHeight + 15})`)
     .attr("id", "legend")
+    .attr("class", "legend")
 
     let colorBandsScale = scaleBand()
     .domain( colorKeys )
@@ -35,7 +36,8 @@ export const makeCategoricalLegend = (
     .data(colorKeys)
     .enter()
     .append("g")
-      .attr("class", "legend-mark-group");
+    .attr("class", "legend-mark-group legend")
+      ;
 
     legendMark.append("rect")
       // .attr("x", (d, i) => 5 + i * 45 )
@@ -44,7 +46,7 @@ export const makeCategoricalLegend = (
       .attr("width", colorBandsScale.bandwidth())
       .attr("height", 25)
       .attr("fill", d => colorScale(d))
-      .attr("class", "legend-mark")
+      .attr("class", "legend-mark legend")
       .attr("opacity", 0.5)
       // .attr("stroke", `var(--secondary-color)`)
       // .attr("stroke-width", "1px")
@@ -60,14 +62,14 @@ export const makeCategoricalLegend = (
       .text(d => d)
       .style("alignment-baseline", "middle")
       // .style("font-size", "1em")
-      .attr("class", "legend-label")
+      .attr("class", "legend-label legend")
       .attr("text-anchor", "middle")
       .attr("fill", "var(--primary-color)")
 
   legend.append("text")
     .text("Console")
     .style("font-weight", 700)
-    .attr("class", "legend-title")
+    .attr("class", "legend-title legend")
     .attr("text-anchor", "start")
     .attr("y", 0)
     .attr("x", 5)

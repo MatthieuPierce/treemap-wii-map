@@ -131,10 +131,15 @@ text {
   border-color: var(--secondary-color);
   /* border-radius: 5px; */
   border-style: solid;
-  border-width: 0px; 
+  border-width: 2px; 
   box-sizing: border-box;
   color: var(--secondary-color);
-  /* display: grid; */
+  display: grid;
+  /* grid-auto-flow: dense; */
+  gap: 0.5rem;
+  grid-template-columns: minmax(min-content, 1fr) minmax(100px, 100px);
+  grid-template-areas:  "name category"
+                        "name value";
   font-size: 1rem;
   padding: 0.5rem;
   /* filter: drop-shadow(1rem 1rem 0.5rem hsla(210, 33%, 9%, 0.5)); */
@@ -142,9 +147,9 @@ text {
   width: 90px; */
   position: absolute;
   /* opacity: 1; */
-  place-items: center;
-  place-content: center;
-  text-align: center;
+  align-items: center;
+  place-content: start;
+  text-align: start;
   /* visibility: visible;
   z-index: 10; */
 }
@@ -154,8 +159,26 @@ text {
   text-shadow: 1px 1px 1px var(--primary-color);
   margin: 0;
   font-size: 1rem;
-
   /* padding: 0 15px;  */
+}
+
+#tooltip p.tooltip-name {
+  grid-area: name;
+  font-size: 1.2rem;
+}
+
+#tooltip p.tooltip-category {
+  grid-area: category;
+}
+
+
+
+#tooltip p.tooltip-value {
+  grid-area: value;
+}
+
+#tooltip p.tooltip-category,  #tooltip p.tooltip-value {
+  font-size: 0.8rem;
 }
 
 g.leaf-group:hover rect, g.legend-mark-group:hover rect {
