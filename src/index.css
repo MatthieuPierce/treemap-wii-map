@@ -51,7 +51,12 @@ article {
 }
 
 div {
-  margin: 0 0 0.2rem;
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 0;
   padding: 0;
   user-select: none;
   font-size: 0.6rem;
@@ -92,11 +97,6 @@ h2 {
   margin: 0 1rem 0.5rem;
  }
 
-article p {
-  padding: 0 0.5rem;
-  margin: 0rem 1rem 1rem;
-}
-
 text {
   font-family: 'Inter', sans-serif;
   font-size: 0.7rem;
@@ -126,59 +126,58 @@ text {
 }
 
 #tooltip {
-  background-color: hsla(0, 0%, 98%, 0.2);
+  /* background-color: hsla(0, 0%, 98%, 0.2); */
   backdrop-filter: blur(15px);
-  border-color: var(--primary-color-fade);
-  border-radius: 5px;
+  border-color: var(--secondary-color);
+  /* border-radius: 5px; */
   border-style: solid;
-  border-width: 1px; 
+  border-width: 0px; 
   box-sizing: border-box;
-  color: var(--primary-color);
-  display: grid;
-  font-size: 0.8rem;
+  color: var(--secondary-color);
+  /* display: grid; */
+  font-size: 1rem;
   padding: 0.5rem;
   /* filter: drop-shadow(1rem 1rem 0.5rem hsla(210, 33%, 9%, 0.5)); */
-  /* height: 90px; */
-  /* width: 90px; */
+  /* height: 90px;
+  width: 90px; */
   position: absolute;
-  opacity: 1;
+  /* opacity: 1; */
   place-items: center;
   place-content: center;
   text-align: center;
-  z-index: 0;
+  /* visibility: visible;
+  z-index: 10; */
 }
 
 #tooltip p {
   box-sizing: border-box;
+  text-shadow: 1px 1px 1px var(--primary-color);
   margin: 0;
+  font-size: 1rem;
+
   /* padding: 0 15px;  */
 }
 
-#tooltip p.cool {
-  color: var(--cool-color);
-  /* margin: 0.2rem 0 0 0; */
-
-}
-
-#tooltip p.hot {
-  color: var(--hot-color);
-  /* margin: 0.2rem 0 0 0; */
-
-}
-
-g.leaf-group:hover rect {
+g.leaf-group:hover rect, g.legend-mark-group:hover rect {
   fill-opacity: 1;
+  opacity: 1;
   color: var(--secondary-color);
 }
 
-g.leaf-group:hover div {
+g.leaf-group:hover p, g.legend-mark-group:hover text {
   /* fill-opacity: 1; */
   color: var(--secondary-color);
   text-shadow: 1px 1px 1px var(--primary-color-fade);
+  fill: var(--secondary-color);
+
 
 }
 
 .units-sold {
   color: var(--primary-color-fade);
   font-weight: lighter;
+}
+
+.legend-label {
+  font-weight: 700;
 }

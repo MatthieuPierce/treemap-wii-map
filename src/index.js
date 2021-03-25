@@ -9,14 +9,11 @@ import {
   treemap,
   treemapSquarify,
   schemePaired,
-  interpolateTurbo,
   interpolateSinebow,
   range
  } from 'd3';
- import { feature, mesh } from 'topojson-client';
-import { colorValue } from './accessors';
+import { leafName, leafValue, parentName } from './accessors';
 import { chart, innerHeight, innerWidth } from './chartParameters';
-import { makeSequentialLegend } from './legendSequential'
 import { parseData } from './parseData';
 import { handleMouseOver, handleMouseOut } from './handleMouse';
 import { makeCategoricalLegend } from './legendCategorical';
@@ -42,18 +39,16 @@ let asyncWrapper = async () => {
     // Parse dataset function in parseData.js
     // arriving as a hierarchy that has already received sum() and sort()
     dataset = parseData(data);
-
     // Console out incoming parsed dataset for examination
     // console.log("dataset:")
     // console.log(dataset);
 
-
     // Add style SVG filter and filter functions for use in tooltip hover
-    chart.append("filter")
-      .attr("id", "svgFilter")
-      .append("feMorphology")
-        .attr("operator", "erode")
-        .attr("radius", 1)
+    // chart.append("filter")
+    //   .attr("id", "svgFilter")
+    //   .append("feMorphology")
+    //     .attr("operator", "erode")
+    //     .attr("radius", 1)
 
     // Tooltip -- from tooltip.js)
 
@@ -69,116 +64,114 @@ let asyncWrapper = async () => {
       .round(true)
       (d);
 
-  let root = myTreemap(dataset)
-  console.log(`root`)
-  console.log(root)
+    let root = myTreemap(dataset)
 
-  const categories = root.children.map(node => node.data.name)
+    const categories = root.children.map(node => node.data.name)
 
-  // console.log(`root.leaves()`)
-  // console.log(root.leaves())
+    // // colorScale sequential   // used colorScaleOrdinalSeq instead
+    // const colorScale = scaleSequential(interpolateBuGn)
+    // .domain(extent(dataset, colorValue))
+    // // .range([0, 1])
 
-  // colorScale sequential
-  const colorScale = scaleSequential(interpolateBuGn)
-  .domain(extent(dataset, colorValue))
-  // .range([0, 1])
+    // ordinal colorScale       // used colorScaleOrdinalSeq instead
+    // const catColorScale = scaleOrdinal(schemePaired)
+    //   .domain(categories)
 
-  // ordinal colorScale
-  const catColorScale = scaleOrdinal(schemePaired)
-    .domain(categories)
+    // colorScaleOrdinalSeq - oridinal colorScale from sequential scheme
+    // Make categorical/ordinal color scheme from sequential interprolator
+    // from arbitrary number/arr (here categories.length for node parents)
+    // categorySteps assumes range of [0, 1], per d3 interpolators
+    let categorySteps = 1 / categories.length;
+    let categoryTValues = range(0, 1, categorySteps).concat(1);
+    // re-sort values to radiate from 0 in the center
+    let valuesReSort = categoryTValues.reduce((acc, e, i) => {
+      let firstAcc = acc[0];
+      let lastAcc = acc[acc.length - 1];
+      if (Math.abs(firstAcc + e) >= Math.abs(lastAcc + e)) {
+        return [...acc, e]
+      } else {
+        return [ e, ...acc]
+      }
+    },[])
+    let schemeOrdinalSequential = valuesReSort.map(t => interpolateSinebow(t));
+    // let schemeShuffle = shuffle(schemeOrdinalSequential.slice());
+    const colorScaleOrdinalSeq = scaleOrdinal(schemeOrdinalSequential)
+      .domain(categories);
 
-  
-  // Make categorical/ordinal color scheme from sequential interprolator
-  // based on arbitrary number/array (here categories.length for node parents)
-  let categorySteps = 1 / categories.length;
-  let categoryTValues = range(0, 1, categorySteps).concat(1);
-  // re-sort values to radiate from 0 in the center
-  let valuesResort = categoryTValues.reduce((acc, e, i) => {
-    // let absE = Math.abs(e);
-    let firstAcc = acc[0];
-    let lastAcc = acc[acc.length - 1];
+    // tiles: treemap leaf tile groups
+    let leaf = chart.selectAll("g")
+        .data(root.leaves())
+        .join("g")
+          .attr("transform", d => `translate(${d.x0}, ${d.y0})`)
+          .attr("class", "leaf-group")
+          .on("mouseover mousemove pointerover focus", handleMouseOver)
+          .on("mouseout pounterout pointerleave", handleMouseOut)
 
-    if (Math.abs(firstAcc + e) >= Math.abs(lastAcc + e)) {
-      return [...acc, e]
-    } else {
-      return [ e, ...acc]
-    }
-  },[])
-  console.log(valuesResort);
+      let spaceRegex = /\s/gi;
+      let etcRegex = /[^a-zA-Z0-9\-]/gi
+      const formatStringForId = s => s.replaceAll(spaceRegex, '-').replaceAll(etcRegex, '');
 
-  let schemeOrdinalSequential = valuesResort.map(t => interpolateSinebow(t));
-  let schemeShuffle = shuffle(schemeOrdinalSequential.slice());
+    // treemap leaf tile rects
+      leaf.append("rect")
+        .attr("id", d => `leaf-rect-${formatStringForId(leafName(d))}`)
+        .attr("class", "tile")
+        .attr("data-name", d => `${leafName(d)}`)
+        // alternative for data-category is d.data.category; less future-proof
+        .attr("data-category", d => `${parentName(d)}`)
+        .attr("data-value", d => d.value)
+        .attr("fill", d => colorScaleOrdinalSeq(parentName(d)))
+        .attr("fill-opacity", 0.5)
+        .attr("width", d => d.x1 - d.x0)
+        .attr("height", d => d.y1 - d.y0)
+        
+    // clip path for text in leaf
+    leaf.append("clipPath")
+      .attr("id", d => `leaf-clip-path-${formatStringForId(leafName(d))}`)
+      .append("use")
+      .attr("xlink:href", d => `#leaf-rect-${formatStringForId(leafName(d))}`)
 
-  // oridinal colorScale from multi-hue scheme
-  const colorScaleOrdinalSequential = scaleOrdinal(schemeOrdinalSequential)
-    .domain(categories);
+    // treemap leaf text as svg foreignObject
+    let foreignDiv = leaf.append("foreignObject")
+      .attr("class", "tile-foreign-object")
+      // .attr("clip-path", d => `url(#leaf-clip-path-${formatStringForId(leafName(d))})` )
+      .attr("x", 5)
+      .attr("y", 5)
+      .attr("width", d => d.x1 - d.x0 - 5)
+      .attr("height", d => d.y1 - d.y0 - 10)
+      .append('xhtml:div')
+        .attr("class", "tile-foreign-div")
+        .on("mouseover mousemove pointerover focus", 
+          (event, d) => handleMouseOver(event, d, colorScaleOrdinalSeq))
+        .on("mouseout pounterout pointerleave", 
+          (event, d) => handleMouseOut(event, d))
 
-  // tiles: treemap leaf tile groups
-   let leaf = chart.selectAll("g")
-      .data(root.leaves())
-      .join("g")
-        .attr("transform", d => `translate(${d.x0}, ${d.y0})`)
-        .attr("class", "leaf-group")
+    foreignDiv.append('xhtml:p')
+      // .attr("xmlns", "http://www.w3.org/1999/xhtml")
+      .attr("class", "data-name")
+      .text(d => `${leafName(d)}`)
 
-    let spaceRegex = /\s/gi;
-    let etcRegex = /[^a-zA-Z0-9\-]/gi
-    const formatStringForId = s => s.replaceAll(spaceRegex, '-').replaceAll(etcRegex, '');
+    foreignDiv.append('xhtml:p')
+      // .attr("xmlns", "http://www.w3.org/1999/xhtml")
+      .attr("class", "units-sold")
+      .text(d => `${leafValue(d)}M sold`)
 
-  // treemap leaf tile rects
-    leaf.append("rect")
-      .attr("id", d => `leaf-rect-${formatStringForId(d.data.name)}`)
-      .attr("class", "tile")
-      .attr("data-name", d => `${d.data.name}`)
-      // alternative for data-category is d.data.category; less future-proof
-      .attr("data-category", d => `${d.parent.data.name}`)
-      .attr("data-value", d => d.value)
-      .attr("fill", d => colorScaleOrdinalSequential(d.parent.data.name))
-      .attr("fill-opacity", 0.5)
-      .attr("width", d => d.x1 - d.x0)
-      .attr("height", d => d.y1 - d.y0)
-
-  // clip path for text in leaf
-  leaf.append("clipPath")
-    .attr("id", d => `leaf-clip-path-${formatStringForId(d.data.name)}`)
-    .append("use")
-      .attr("xlink:href", d => `#leaf-rect-${formatStringForId(d.data.name)}`)
-
-
-  // treemap leaf text as svg foreignObject
-  let foreignText = leaf.append("foreignObject")
-    .attr("class", "tile-text")
-    // .attr("clip-path", d => `url(#leaf-clip-path-${formatStringForId(d.data.name)})` )
-    .attr("x", 5)
-    .attr("y", 5)
-    .attr("width", d => d.x1 - d.x0 - 5)
-    .attr("height", d => d.y1 - d.y0 - 10)
-
-  foreignText.append('xhtml:div')
-    // .attr("xmlns", "http://www.w3.org/1999/xhtml")
-    .text(d => `${d.data.name}`)
-
-  foreignText.append('xhtml:div')
-    // .attr("xmlns", "http://www.w3.org/1999/xhtml")
-    .attr("class", "units-sold")
-    .text(d => `${d.data.value}M sold`)
-
-  // treemap leaf text
-    // leaf.append("text")
-    //   .attr("class", "tile-text")
-    //   .attr("clip-path", d => `url(#leaf-clip-path-${formatStringForId(d.data.name)})` )
-    //   .selectAll("tspan")
-    //     // Split name string (expect multiple words) into array of words
-    //     // for entry into distinct tspans 
-    //   .data(d => d.data.name.split(" ").concat(`${d.value}M units`))
-    //   .join("tspan")
-    //     .attr("fill", "var(--primary-color)")
-    //     .text(d => d)
-    //     .attr("x", 5)
-    //     .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
+    // treemap leaf text
+      // leaf.append("text")
+      //   .attr("class", "tile-text")
+      //   .attr("clip-path", d => `url(#leaf-clip-path-${formatStringForId(leafName(d))})` )
+      //   .selectAll("tspan")
+      //     // Split name string (expect multiple words) into array of words
+      //     // for entry into distinct tspans 
+      //   .data(d => leafName(d).split(" ").concat(`${d.value}M units`))
+      //   .join("tspan")
+      //     .attr("fill", "var(--primary-color)")
+      //     .text(d => d)
+      //     .attr("x", 5)
+      //     .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
 
     // makeCategoricalLegend takes colorKeys and colorScale
 
-    makeCategoricalLegend(categories, colorScaleOrdinalSequential);
+    makeCategoricalLegend(categories, colorScaleOrdinalSeq);
 
     }
   )

@@ -1,10 +1,8 @@
 
 // Accessor functions 
 
-export const xValue = d => d["jsYear"];
+export const leafName = d => d.data.name;
 
-export const yValue = d => d["monthString"];
+export const leafValue = d => d.data.value;
 
-export const colorValue = d => d["bachelorsOrHigher"];
-
-export const dataMonthValue = d => d["zeroMonth"];
+export const parentName = d => d.parent.data.name;

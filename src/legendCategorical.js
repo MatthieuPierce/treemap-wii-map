@@ -31,10 +31,13 @@ export const makeCategoricalLegend = (
   //     .attr("stroke-dasharray", "10 5 5 5");
 
   // legend marks
-  legend.selectAll("legend-mark")
+  let legendMark = legend.selectAll("g")
     .data(colorKeys)
     .enter()
-    .append("rect")
+    .append("g")
+      .attr("class", "legend-mark-group");
+
+    legendMark.append("rect")
       // .attr("x", (d, i) => 5 + i * 45 )
       .attr("x", d => colorBandsScale(d))
       .attr("y", 5 )
@@ -51,10 +54,7 @@ export const makeCategoricalLegend = (
       .on("mouseout", handleMouseOut)
 
   // legend labels
-  legend.selectAll("legend-label")
-    .data(colorKeys)
-    .enter()
-    .append("text")
+  legendMark.append("text")
     .attr("x", d => colorBandsScale(d) + colorBandsScale.bandwidth() / 2)
     .attr("y", 20)
       .text(d => d)
@@ -66,7 +66,7 @@ export const makeCategoricalLegend = (
 
   legend.append("text")
     .text("Console")
-    // .attr("font-size", "2rem")
+    .style("font-weight", 700)
     .attr("class", "legend-title")
     .attr("text-anchor", "start")
     .attr("y", 0)
