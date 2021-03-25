@@ -50,6 +50,11 @@ article {
   z-index: 1;
 }
 
+foreignObject {
+  /* height: 100%;
+  width: 100%; */
+}
+
 main {
   width: 100%;
   display: flex;
@@ -89,6 +94,8 @@ article p {
 
 text {
   font-family: 'Inter', sans-serif;
+  font-size: 0.6rem;
+  color: var(--primary-color);
 }
 
 #chart-container {
@@ -152,4 +159,8 @@ text {
   color: var(--hot-color);
   /* margin: 0.2rem 0 0 0; */
 
+}
+
+rect:hover {
+  fill-opacity: 1;
 }
